@@ -1,0 +1,38 @@
+name: ci
+on:
+  push:
+  pull_request:
+
+# Job names, not workflow names, are what `factory.yml`'s `checks:` matches.
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      # No `cache: pnpm`. setup-node's cache step looks for a lockfile *before*
+      # anything installs, and this repo is created without one — it fails hard
+      # with "Dependencies lock file is not found", so both jobs would go red
+      # before running a line of the project. `factory.yml` names these two job
+      # names, so Verify's gate would never pass and the golden run could never
+      # reach pr-ready. Two dev dependencies do not need a cache.
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm test
+
+  typecheck:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: pnpm/action-setup@v4
+        with:
+          version: 10
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+      - run: pnpm install --no-frozen-lockfile
+      - run: pnpm typecheck

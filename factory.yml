@@ -1,0 +1,8 @@
+version: 1
+checks:
+  - test
+  - typecheck
+conventions: |
+  A tiny TypeScript project. Strict mode, vitest, no build step.
+  Keep changes small and covered by a test.
+network: []
