@@ -3,9 +3,12 @@ export interface Transport {
   send(payload: string): Promise<number>;
 }
 
-/** Uploads once. Any 4xx or 5xx is a failure. */
+/** Uploads once, retrying a single time on a 503. Any 4xx or 5xx is a failure. */
 export async function upload(transport: Transport, payload: string): Promise<void> {
-  const status = await transport.send(payload);
+  let status = await transport.send(payload);
+  if (status === 503) {
+    status = await transport.send(payload);
+  }
   if (status >= 400) {
     throw new Error(`upload failed with ${status}`);
   }
