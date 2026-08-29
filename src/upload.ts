@@ -3,7 +3,11 @@ export interface Transport {
   send(payload: string): Promise<number>;
 }
 
-/** Uploads once. Any 4xx or 5xx is a failure. */
+/**
+ * Uploads once. Any 4xx or 5xx is a failure.
+ * Rejects an empty payload before the transport is touched, since it can
+ * never carry anything useful and would only cost a round trip.
+ */
 export async function upload(transport: Transport, payload: string): Promise<void> {
   if (payload === "") {
     throw new Error("refusing to upload an empty payload");
