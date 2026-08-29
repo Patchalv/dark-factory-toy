@@ -3,7 +3,11 @@ export interface Transport {
   send(payload: string): Promise<number>;
 }
 
-/** The attempt budget every service in this account uses for temporary failures. */
+// This repo has no shared retry/config module for other services to check
+// this against — it's a single-file project. 3 total attempts (i.e. up to
+// 2 retries) is the account-wide standard confirmed out of band; it is not
+// derived from anything in this codebase, and it must be kept in sync by
+// hand with whatever the other services use.
 const MAX_ATTEMPTS = 3;
 
 /**
